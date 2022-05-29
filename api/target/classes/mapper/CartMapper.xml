@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.mapper.CartMapper">
+    <select id="getProductToCart" resultType="com.shopping.eneity.Cart">
+        select * from cart where uID = #{uID} and productID = #{productID}
+     </select>
+
+    <insert id="addProductToCart" useGeneratedKeys="true" keyProperty="id">
+      insert into cart(uID,productID,quantity,createTime,color,size,capacity) values(#{uID},#{productID},#{quantity},now(),#{color},#{size},#{capacity})
+    </insert>
+
+    <update id="updateProductToCart" useGeneratedKeys="true" keyProperty="id">
+        update cart set updateTime = now()
+        <if test="quantity!=null and quantity!=''">,quantity = #{quantity}</if>
+        <if test="size!=null and size!=''">,size = #{size}</if>
+        <if test="color!=null and color!=''">,color = #{color}</if>
+        <if test="capacity!=null and capacity!=''">,capacity = #{capacity} </if>
+        where uID= #{uID} and productID = #{productID}
+    </update>
+
+
+    <resultMap id="CartMapper" type="com.shopping.vo.cartVo">
+        <id property="id" column="id" />
+        <result property="uID" column="uID" />
+        <result property="productID" column="productID" />
+        <result property="quantity" column="quantity" />
+        <result property="productName" column="productName" />
+        <result property="shopName" column="shopName" />
+        <result property="price" column="price" />
+        <result property="number" column="number" />
+        <result property="cover" column="cover" />
+        <result property="discount" column="discount" />
+        <result property="content" column="content" />
+        <result property="type" column="type" />
+        <result property="colors" column="colors" />
+        <result property="sizes" column="sizes" />
+        <result property="capacitys" column="capacitys" />
+    </resultMap>
+
+    <select id="getCartList" resultType="com.shopping.eneity.Cart" resultMap="CartMapper">
+        select c.*,p.productName,p.shopName,p.price,p.number,p.cover,p.discount,p.type,p.content,p.sizes,p.colors,p.capacitys
+        from cart c,product p where c.productID = p.id AND c.uID = #{uID}
+    </select>
+
+    <delete id="deleteProduct">
+        delete from cart where uID=#{uID} and productID in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </delete>
+
+</mapper>

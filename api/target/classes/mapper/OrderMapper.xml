@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.mapper.OrderMapper">
+    <insert id="insertOrder">
+        insert into orders(id,uID,name,address,phone,code,district,totalPrice,actuallyPrice,discounts,quantity,postage,orderTime,paymentWay,deliverWay,state,bill)
+        values(#{id},#{uID},#{name},#{address},#{phone},#{code},#{district},#{totalPrice},#{actuallyPrice},#{discounts},#{quantity},#{postage},now(),#{paymentWay},#{deliverWay},#{state},#{bill})
+    </insert>
+
+    <insert id="insertSubmitOrder" parameterType="list" useGeneratedKeys="true" keyProperty="id">
+        insert into submitOrder(orderID,productID,productName,content,cover,price,discount,num,number,shopName,capacity,color,size)
+        <foreach collection="idList" item="item" separator="union all">
+            select * from (select #{id} as orderID,#{item.id} as productID,productName as productName,content as content,
+            cover as cover,price as price,discount as discount,#{item.quantity} as quantity,number as number,shopName as shopName,
+            #{item.capacity} as capacity,#{item.color} as color,#{item.size} as size from product where id=#{item.id}) as submitOrder
+        </foreach>
+    </insert>
+
+    <select id="getOrderList" resultMap="getProductList" resultType="com.shopping.eneity.Order">
+        select o.*,s.* from orders o,submitOrder s where o.uID=#{uID} and s.orderID=o.id
+        <if test="oId!=null and oId!=''"> and o.id=#{oId}</if>
+        <!--<if test="proName != null and proName != ''">and s.productName like concat('%', #{proName}, '%')</if>-->
+    </select>
+
+    <resultMap id="getProductList" type="com.shopping.eneity.Order">
+        <id column="id" property="id" javaType="Long"></id>
+        <result column="uID" property="uID" javaType="Integer"></result>
+        <result column="totalPrice" property="totalPrice" javaType="Double"></result>
+        <result column="actuallyPrice" property="actuallyPrice" javaType="Double"></result>
+        <result column="postage" property="postage" javaType="Double"></result>
+        <result column="orderTime" property="orderTime" javaType="Date"></result>
+        <result column="bill" property="bill" javaType="String"></result>
+        <result column="quantity" property="quantity" javaType="Integer"></result>
+        <result column="name" property="name" javaType="String"></result>
+        <result column="address" property="address" javaType="String"></result>
+        <result column="phone" property="phone" javaType="String"></result>
+        <result column="district" property="district" javaType="String"></result>
+        <result column="paymentWay" property="paymentWay" javaType="String"></result>
+        <result column="deliverWay" property="deliverWay" javaType="String"></result>
+        <result column="code" property="code" javaType="String"></result>
+        <result column="discounts" property="discounts" javaType="Double"></result>
+        <collection property="pList" ofType="com.shopping.eneity.SubmitOrder">
+            <id column="productID" property="productID" javaType="Integer"></id>
+            <result column="productName" property="productName" javaType="String"></result>
+            <result column="price" property="price" javaType="Double"></result>
+            <result column="discount" property="discount" javaType="Double"></result>
+            <result column="number" property="number" javaType="String"></result>
+            <result column="cover" property="cover" javaType="String"></result>
+            <result column="content" property="content" javaType="String"></result>
+            <result column="shopName" property="shopName" javaType="String"></result>
+            <result column="num" property="num" javaType="Integer"></result>
+        </collection>
+    </resultMap>
+
+    <delete id="deleteProduct">
+        delete from cart where uID=#{uID} and productID in
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item.id}</foreach>
+    </delete>
+
+
+</mapper>
+

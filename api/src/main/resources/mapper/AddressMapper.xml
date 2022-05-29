@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shopping.mapper.AddressMapper">
+
+    <select id="getAddressList" resultType="com.shopping.eneity.Address">
+        select * from address where uID = #{uId}
+    </select>
+
+    <update id="updateAddress" useGeneratedKeys="true" keyProperty="id">
+        update address set name=#{name},address=#{address},phone=#{phone},code=#{code},district=#{district},type=#{type},flag=#{flag}
+        where id=#{id}
+    </update>
+
+    <update id="updateFlag" useGeneratedKeys="true" keyProperty="id">
+        update address set flag='0' where id!=#{id} and uID=#{uId}
+    </update>
+
+    <insert id="insertAddress"  useGeneratedKeys="true" keyProperty="id">
+        insert into address(uID,name,address,phone,code,district,type,flag) values(#{uID},#{name},#{address},#{phone},#{code},#{district},#{type},#{flag})
+    </insert>
+
+    <delete id="deleteAddress" parameterType="int">
+        delete from address where id=#{id}
+    </delete>
+
+</mapper>

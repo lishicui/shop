@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shopping.mapper.UserMapper">
+
+    <select id="getUser" resultType="com.shopping.eneity.User" >
+        select * from user where name= #{name} and pwd = #{pwd}
+       </select>
+
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into user(name,pwd,address,phone) values(#{name},#{pwd},#{address},#{phone})
+   </insert>
+
+   <select id="getUserByUserName" resultType="com.shopping.eneity.User">
+       select * from user where name = #{name}
+    </select>
+
+
+</mapper>
